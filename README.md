@@ -1,54 +1,27 @@
-
-  
-
-  
-
 # App Crawl Node -
-
-  
 
 ### Prerequisites :
 
-* [node-js](https://github.com/creationix/nvm) v20
-* [npm](https://npmjs.com/)
-
-  
-
-  
-
-  
+- [node-js](https://github.com/creationix/nvm) v20
+- [npm](https://npmjs.com/)
 
 ## Project Setup
-
-  
-
-  
-
-  
 
 ```sh
 nvm use
 ```
 
-  
-
-  
-
 ```sh
 npm install
 ```
 
-  
-
 ## Create .env from .env.example
-
-  
 
 ```
 # Application Settings
 APP_PORT=3000
 
- 
+
 # Database settings
 DB_DIALECT=mysql
 DB_HOST=localhost
@@ -63,27 +36,19 @@ ELASTIC_SEARCH_USERNAME='elastic'
 ELASTIC_SEARCH_PASSWORD='password'
 ```
 
-  
-
 ### Start crawling and save users to MYSQL and Elasticsearch
-
-  
-
-  
 
 ```sh
 
 npm run crawl:clients
 
-  
+
 
 ```
 
 ## Elastic Search Record Creation/ Deletion/ Updation
 
 Records on elasic search are automatically created, updated or deleted based on Sequelize AfterCreate , AfterUpdate , AfterDestroy Hooks
-
-  
 
 ## API Endpoints
 
@@ -97,17 +62,14 @@ Mysql DB Search : GET: http://localhost:3000/clients/?perPage=10&page=1&id=1&ema
 
 Create new client : POST :http://localhost:3000/clients
 
-Get Client By Id : GET : http://localhost:3000/clients/1
+Get Client By Id From Elastic Search: GET : http://localhost:3000/clients/1
 
 Update Client : POST : http://localhost:3000/clients/55
 
 Delete Client : DELETE : http://localhost:3000/clients/54
 ```
 
-  
-
 ### Compile and Hot-Reload for Development
-
 
 ```sh
 npm run dev
