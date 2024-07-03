@@ -1,4 +1,5 @@
 import Sequelize, { Model } from "sequelize";
+import elasticSearchService from "../services/elastic-search.service.js";
 
 class Client extends Model {
   static init(sequelize) {
@@ -30,15 +31,12 @@ class Client extends Model {
       }
     );
 
-    this.addHook("afterDestroy", async (user) => {
-
+    this.addHook("afterCreate", async (user) => {
+      await elasticSearchService.create(user);
     });
 
     this.addHook("afterUpdate", async (user) => {
-
-    });
-
-    this.addHook("afterCreate", async (user) => {
+      await elasticSearchService.update(user);
     });
 
     return this;

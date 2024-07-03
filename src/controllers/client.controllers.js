@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 import Client from "../models/Client.js";
 import { Sequelize } from "sequelize";
+import elasticSearchService from "../services/elastic-search.service.js";
 
 const clientSchema = Yup.object().shape({
     name: Yup.string().required("Client name is required"),
@@ -20,6 +21,14 @@ let clientController = {
         try {
             const clients = await Client.findAll();
             return res.status(200).json(clients);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    getAllFromElasticSearch: async (req, res, next) => {
+        try {
+            return await elasticSearchService.searchIndex(req.query);
         } catch (error) {
             next(error);
         }
@@ -59,10 +68,10 @@ let clientController = {
             }
 
             const newClient = await Client.create(body);
+
             // record in elastic search will be created via sequelize -> after create hook -> src/models/Client.js
             return res.status(201).json(newClient);
         } catch (error) {
-            console.log(error);
             if (error.name === "ValidationError") {
                 return res.status(400).json({ message: error.message });
             }
@@ -116,7 +125,7 @@ let clientController = {
         try {
             const { id } = req.params;
             const deletedCount = await Client.destroy({ where: { id } });
-            // record in elastic search will be deleted via sequelize : after destory hook -> src/models/Client.js
+            await elasticSearchService.delete(id);
 
             if (deletedCount === 0) {
                 return res.status(404).json({ message: "Client not found" });

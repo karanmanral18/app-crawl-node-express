@@ -2,10 +2,12 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Client from './models/Client.js';
 import sequelizeService from "./services/sequelize.service.js";
+import elasticSearchService from "./services/elastic-search.service.js";
 
 (async () => {
     try {
         await sequelizeService.init();
+        await elasticSearchService.init();
         console.log("[SEQUELIZE] Database service initialized");
         await run();
     } catch (error) {
