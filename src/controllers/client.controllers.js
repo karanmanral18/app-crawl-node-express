@@ -28,8 +28,10 @@ let clientController = {
 
     getAllFromElasticSearch: async (req, res, next) => {
         try {
-            return await elasticSearchService.searchIndex(req.query);
+            const data = await elasticSearchService.searchIndex(req.query);
+            return res.status(200).json(data);
         } catch (error) {
+            console.log(error);
             next(error);
         }
     },

@@ -16,6 +16,9 @@ const elasticSearchService = {
                         username: process.env.ELASTIC_SEARCH_USERNAME,
                         password: process.env.ELASTIC_SEARCH_PASSWORD,
                     },
+                    maxRetries: 5,
+                    requestTimeout: 60000,
+                    sniffOnStart: true,
                 });
                 console.log("[ELASTIC-SEARCH] Elastic search service initialized");
                 return elasticClientInstance;
@@ -117,7 +120,6 @@ const elasticSearchService = {
     searchIndex: async (filters) => {
         try {
             const searchData = elasticSearchService.createSearchObject(filters);
-            console.log('_____________________', searchData, '_____________________',);
             return elasticClientInstance.search(searchData);
         } catch (error) {
             console.error("[ELASTIC-SEARCH] Error during client search:", error);
