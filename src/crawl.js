@@ -62,7 +62,8 @@ async function run() {
         });
         console.log('Creating client', client);
         try {
-            await Client.create(client);
+            const newClient = await Client.create(client);
+            await elasticSearchService.create(newClient);
         } catch (error) {
             console.log(error);
         }

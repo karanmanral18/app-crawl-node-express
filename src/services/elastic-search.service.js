@@ -57,8 +57,8 @@ const elasticSearchService = {
     update: async (clientData) => {
         try {
             const data = elasticSearchService.prepareClientDocument(clientData);
-            await elasticSearchService.delete(clientData);
-            const response = await elasticSearchService.create(data)
+            await elasticSearchService.delete(clientData.id);
+            const response = await elasticClientInstance.bulk(data);
             console.log("[ELASTIC-SEARCH] Update response:", response);
             return response;
         } catch (error) {
@@ -104,14 +104,14 @@ const elasticSearchService = {
             if (filters.name) {
                 shouldClauses.push({
                     wildcard: {
-                        name: `*${filters.name}*`,
+                        name: `*${filters.name.toLowerCase()}*`,
                     },
                 });
             }
             if (filters.email) {
                 shouldClauses.push({
                     wildcard: {
-                        email: `*${filters.email}*`,
+                        email: `*${filters.email.toLowerCase()}*`,
                     },
                 });
             }

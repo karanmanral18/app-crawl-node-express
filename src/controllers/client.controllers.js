@@ -2,18 +2,19 @@ import * as Yup from "yup";
 import Client from "../models/Client.js";
 import { Sequelize } from "sequelize";
 import elasticSearchService from "../services/elastic-search.service.js";
+import sequelizeService from "../services/sequelize.service.js";
+
+const sequelize = await sequelizeService.init();
 
 const clientSchema = Yup.object().shape({
     name: Yup.string().required("Client name is required"),
     email: Yup.string().email("Invalid email format").required("Email is required"),
     cin: Yup.string()
         .required("CIN is required")
-        .length(21, "CIN must be exactly 21 digits")
-        .matches(/^\d+$/, "CIN must contain only digits"),
+        .length(21, "CIN must be exactly 21 digits"),
     pin: Yup.string()
         .required("PIN is required")
-        .length(6, "PIN must be exactly 6 digits")
-        .matches(/^\d+$/, "PIN must contain only digits"),
+        .length(6, "PIN must be exactly 6 digits"),
 });
 
 let clientController = {
@@ -35,8 +36,7 @@ let clientController = {
             next(error);
         }
     },
-
-    getById: async (req, res, next) => {
+    getByIdFromElasticSeaarch: async (req, res, next) => {
         try {
             const { id } = req.params;
             const client = await elasticSearchService.findOneById(id);
@@ -49,7 +49,21 @@ let clientController = {
         }
     },
 
+    getById: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const client = await Client.findByPk(id);
+            if (!client) {
+                return res.status(404).json({ message: "Client not found" });
+            }
+            return res.status(200).json(client);
+        } catch (error) {
+            next(error);
+        }
+    },
+
     create: async (req, res, next) => {
+        let transaction;
         try {
             const { body } = req;
             await clientSchema.validate(body, { abortEarly: false });
@@ -69,11 +83,17 @@ let clientController = {
                 return res.status(409).json({ type: 'error', message: `Duplicate ${existingField} found.` });
             }
 
+            transaction = await sequelize.transaction();
             const newClient = await Client.create(body);
+            await elasticSearchService.create(newClient);
+            await transaction.commit();
 
             // record in elastic search will be created via sequelize -> after create hook -> src/models/Client.js
             return res.status(201).json(newClient);
         } catch (error) {
+            if (transaction) {
+                await transaction.rollback();
+            }
             if (error.name === "ValidationError") {
                 return res.status(400).json({ message: error.message });
             }
@@ -82,6 +102,7 @@ let clientController = {
     },
 
     update: async (req, res, next) => {
+        let transaction;
         try {
             const { id } = req.params;
             const { body } = req;
@@ -101,6 +122,7 @@ let clientController = {
                 return res.status(409).json({ type: 'error', message: `Duplicate ${existingField} found.` });
             }
 
+            transaction = await sequelize.transaction();
             const client = await Client.findOne({
                 where: { id },
             });
@@ -109,13 +131,17 @@ let clientController = {
                     ...body,
                     id: id
                 });
-                // record in elastic search will be updated via sequelize -> after update hook -> src/models/Client.js
+                await elasticSearchService.update(updatedClient.dataValues);
+                await transaction.commit();
                 return res.status(200).json(updatedClient);
             } else {
                 return res.status(404).json({ message: "Client not found" });
             }
 
         } catch (error) {
+            // if (transaction) {
+            //     await transaction.rollback();
+            // }
             if (error.name === "ValidationError") {
                 return res.status(400).json({ message: error.message });
             }
@@ -124,16 +150,22 @@ let clientController = {
     },
 
     delete: async (req, res, next) => {
+        let transaction;
         try {
             const { id } = req.params;
+            transaction = await sequelize.transaction();
             const deletedCount = await Client.destroy({ where: { id } });
             await elasticSearchService.delete(id);
+            await transaction.commit();
 
             if (deletedCount === 0) {
                 return res.status(404).json({ message: "Client not found" });
             }
             return res.status(204).json();
         } catch (error) {
+            if (transaction) {
+                await transaction.rollback();
+            }
             next(error);
         }
     },

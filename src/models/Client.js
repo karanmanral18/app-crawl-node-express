@@ -31,13 +31,13 @@ class Client extends Model {
       }
     );
 
-    this.addHook("afterCreate", async (user) => {
-      await elasticSearchService.create(user);
-    });
+    // this.addHook("afterCreate", async (user) => {
+    //   await elasticSearchService.create(user);
+    // });
 
-    this.addHook("afterUpdate", async (user) => {
-      await elasticSearchService.update(user);
-    });
+    // this.addHook("afterUpdate", async (user) => {
+    //   await elasticSearchService.update(user);
+    // });
 
     return this;
   }
