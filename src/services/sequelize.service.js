@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import databaseConfig from "../config/database";
+import databaseConfig from "../config/databases";
 import fs from "fs";
 
 const modelFiles = fs
@@ -9,7 +9,7 @@ const modelFiles = fs
 const sequelizeService = {
     init: async () => {
         try {
-            let connection = new Sequelize(databaseConfig);
+            const sequelize = new Sequelize(databaseConfig);
 
             /*
               Loading models automatically
@@ -17,15 +17,18 @@ const sequelizeService = {
 
             for (const file of modelFiles) {
                 const model = await import(`../models/${file}`);
-                model.default.init(connection);
+                model.default.init(sequelize);
             }
 
             modelFiles.map(async (file) => {
                 const model = await import(`../models/${file}`);
-                model.default.associate && model.default.associate(connection.models);
+                model.default.associate && model.default.associate(sequelize.models);
             });
 
-            console.log("[SEQUELIZE] Database service initialized");
+            sequelize.sync({ force: false }).then(res => {
+                console.log("[SEQUELIZE] Database service initialized");
+            })
+
         } catch (error) {
             console.log("[SEQUELIZE] Error during database service initialization");
             throw error;
