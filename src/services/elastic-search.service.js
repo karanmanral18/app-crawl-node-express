@@ -101,8 +101,20 @@ const elasticSearchService = {
 
         if (filters) {
             if (filters.id) shouldClauses.push({ match: { id: filters.id } });
-            if (filters.name) shouldClauses.push({ match: { name: filters.name } });
-            if (filters.email) shouldClauses.push({ match: { email: filters.email } });
+            if (filters.name) {
+                shouldClauses.push({
+                    wildcard: {
+                        name: `*${filters.name}*`,
+                    },
+                });
+            }
+            if (filters.email) {
+                shouldClauses.push({
+                    wildcard: {
+                        email: `*${filters.email}*`,
+                    },
+                });
+            }
             if (filters.cin) shouldClauses.push({ match: { cin: filters.cin } });
         }
 
@@ -124,7 +136,15 @@ const elasticSearchService = {
             filters.perPage = 10;
             fromRecord = 1;
         }
-        return { size: Number(filters.perPage), from: fromRecord, query: query };
+        return {
+            size: Number(filters.perPage), from: fromRecord, query: query, sort: [
+                {
+                    createdAt: {
+                        order: "desc"
+                    }
+                }
+            ]
+        };
     },
     createSearchObject: (filters) => {
         const body = elasticSearchService.createElasticSearchPayload(filters);
