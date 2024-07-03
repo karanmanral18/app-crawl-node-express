@@ -46,10 +46,6 @@ npm run crawl:clients
 
 ```
 
-## Elastic Search Record Creation/ Deletion/ Updation
-
-Records on elasic search are automatically created, updated or deleted based on Sequelize AfterCreate , AfterUpdate , AfterDestroy Hooks
-
 ## API Endpoints
 
 ### ( Postman collections are added in the repository)
