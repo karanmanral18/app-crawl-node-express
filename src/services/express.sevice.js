@@ -29,6 +29,15 @@ const expressService = {
 
             server = express();
             server.use(bodyParser.json());
+
+            // Enable CORS for all origins
+            server.use((req, res, next) => {
+                res.header("Access-Control-Allow-Origin", "*");
+                res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+                next();
+            });
+
             server.use(routes);
             server.use(globalErrorHandler);
             server.listen(process.env.APP_PORT);
