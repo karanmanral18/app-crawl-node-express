@@ -72,6 +72,19 @@ const elasticSearchService = {
             _id: clientId,
         };
     },
+    findOneById: async (id) => {
+        try {
+            const data = {
+                index: clientIndex._index,
+                id: id,
+            };
+            const response = await elasticClientInstance.get(data);
+            return response._source;
+        } catch (error) {
+            console.error("[ELASTIC-SEARCH] Error during document retrieval:", error);
+            throw error;
+        }
+    },
     prepareClientDocument: (client) => {
         const bulk = [];
         bulk.push({

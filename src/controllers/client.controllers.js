@@ -39,7 +39,7 @@ let clientController = {
     getById: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const client = await Client.findByPk(id);
+            const client = await elasticSearchService.findOneById(id);
             if (!client) {
                 return res.status(404).json({ message: "Client not found" });
             }
