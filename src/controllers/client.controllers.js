@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import Client from "../models/Client";
+import Client from "../models/Client.js";
 import { Sequelize } from "sequelize";
 
 const clientSchema = Yup.object().shape({

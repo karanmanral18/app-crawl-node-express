@@ -1,7 +1,12 @@
 import express from "express";
 import fs from "fs";
 import bodyParser from "body-parser";
-import globalErrorHandler from "../middlewares/errorHandler.middleware";
+import globalErrorHandler from "../middlewares/errorHandler.middleware.js";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const routeFiles = fs
     .readdirSync(__dirname + "/../routes/")

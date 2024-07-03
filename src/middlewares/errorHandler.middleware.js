@@ -1,5 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
-import { IsApiError, ApiError } from '../utils/ApiError';
+import { IsApiError } from '../utils/ApiError.js';
 const currentEnv = process.env.NODE_ENV || 'development';
 export default (err, _req, res, next) => {
   if (res.headersSent) return next(err);

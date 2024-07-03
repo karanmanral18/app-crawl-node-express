@@ -1,6 +1,13 @@
 import { Sequelize } from "sequelize";
-import databaseConfig from "../config/databases";
+import databaseConfig from "../config/databases.js";
 import fs from "fs";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 const modelFiles = fs
     .readdirSync(__dirname + "/../models/")
